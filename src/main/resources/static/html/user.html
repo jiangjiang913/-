@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>日新日活分析</title>
+</head>
+<link rel="stylesheet" href="../css/index.css">
+<!--用户事件页面-->
+<body>
+<form id="in2-form1" name="userDimForm" action="user.html" method="post">
+    <label>日新日活分析维度</label>
+    <select onchange="showText()">
+        <option value="province" selected="selected">省份</option>
+        <option value="city">城市</option>
+        <option value="district">区域</option>
+        <option value="appver">软件版本</option>
+        <option value="appver">设备类型</option>
+    </select>
+</form>
+<form id="DA_DN" action="user.html" method="post">
+    <label>日新/日活</label>
+    <select onchange="showText()">
+        <option value="dau_cnts" selected="selected">日活</option>
+        <option value="dnu_cnts">日新</option>
+    </select>
+</form>
+<div id="main">
+    <div id="userChart" style="width: 90%;height: 400px;background:#D4E6F1;">
+<!--        <h1>用户活跃度分析图表</h1>-->
+    </div>
+    <script src="../js/echarts.min.js"></script>
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">
+        var chart2 = echarts.init(document.getElementById("userChart"))
+        var option2 = {
+            title:{
+                text:'',
+                x:'center',
+                textStyle:{
+                    fontSize:12
+                }
+            },
+            xAxis: {
+                type: 'category',
+                // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                data:[]
+            },
+            yAxis: {
+                type: 'value'
+            },
+            series: [
+                {
+                    // data: [120, 200, 150, 80, 70, 110, 130],
+                    data: [],
+                    type: 'bar',
+                    showBackground: true,
+                    backgroundStyle: {
+                        color: 'rgba(180, 180, 180, 0.2)'
+                    },
+                    itemStyle: {
+                        color: '#CB4335'
+                    }
+                }
+            ]
+        };
+        chart2.setOption(option2);
+        var dim=[]
+        var value=[]
+        //Jquery方式获取option的value值
+        var select1=$("#in2-form1 option:selected").val()
+        var type_=$("#DA_DN option:selected").val()
+        var select=select1+type_.split("_")[0].toUpperCase()
+        $.get('/user/'+select).done(function (data1){
+            /**
+             * data1:
+             * [{"dim":"四川省","dau_cnts":2},{"dim":"宁夏回族自治区","dau_cnts":1},{"dim":"安徽省","dau_cnts":2},{"dim":"山东省","dau_cnts":1},{"dim":"山西省","dau_cnts":1},{"dim":"广东省","dau_cnts":3},{"dim":"新疆维吾尔自治区","dau_cnts":1},{"dim":"江苏省","dau_cnts":2},{"dim":"江西省","dau_cnts":1},{"dim":"河北省","dau_cnts":2},{"dim":"河南省","dau_cnts":1},{"dim":"海南省","dau_cnts":1},{"dim":"湖南省","dau_cnts":5},{"dim":"福建省","dau_cnts":1},{"dim":"西藏自治区","dau_cnts":2},{"dim":"贵州省","dau_cnts":1},{"dim":"辽宁省","dau_cnts":2},{"dim":"陕西省","dau_cnts":2}]
+             */
+            for(var i in data1){
+                dim.push(data1[i].dim),
+                    // value.push(data1[i].dau_cnts)
+                value.push(data1[i][type_])
+            }
+            chart2.setOption({
+                // title: {
+                //     show:true,
+                //    text: select1 +type_.split("_")[0]+"条形图",
+                // },
+                xAxis: {
+                    type:'category',
+                    data:dim
+                },
+                series: [
+                    {
+                        data:value
+                    }
+                ]
+            });
+        });
+        chart2.setOption(option2);
+
+    </script>
+    <label style="line-height: 5rem;font-size: 1.5rem;">多维日新日活分析报表</label>
+    <table border="1" style="border-collapse:collapse;" width=80% height="10px" id="table1">
+    </table>
+    <script type="text/javascript">
+        var select1=$("#in2-form1 option:selected").val()
+        var type_=$("#DA_DN option:selected").val()
+        // alert(type_)
+        var select=select1+type_.split("_")[0].toUpperCase()
+        // alert(select)
+        // alert(1)
+        $.get('/user/'+select).done(function (data1){
+            // alert(2)
+            var tableitem1=""
+            var tableitem2=""
+            var name=[]
+            for(var i in data1){
+                var map1 = new Map()
+                map1.set("dim",data1[i].dim)
+                // map1.set("value",data1[i].dau_cnts)
+                map1.set("value",data1[i][type_])
+                name.push(map1)
+            }
+
+            for(var i in name){
+                tableitem1+="<th>"+name[i].get("dim")+"</th>",
+                    tableitem2+="<td>"+name[i].get("value")+"</td>"
+            }
+            var $tableitem=$("<tr height=70px>"+tableitem1+"</tr>"+"<tr height=70px>"+tableitem2+"</tr>")
+            var table1 = document.getElementById("table1");
+           $tableitem.appendTo(table1)
+        });
+        function showText() {   //用于更新select表单选择时的可视化
+            dim=[]
+            type_=$("#DA_DN option:selected").val()
+            select1 = $("#in2-form1 option:selected").val();
+            select=select1+type_.split("_")[0].toUpperCase()
+            // alert(select)
+            $.get('/user/'+select).done(function (data1){
+                for(var i in data1){
+                    // alert(2)
+                    dim.push(data1[i].dim),
+                        // value.push(data1[i].dau_cnts)
+                    value.push(data1[i][type_])
+                }
+                chart2.setOption({
+                    // title: {
+                    //     show:true,
+                    //     text: select1 +type_.split("_")[0]+"条形图",
+                    // },
+                    xAxis: {
+                        type:'category',
+                        data:dim
+                    },
+                    series: [
+                        {
+                            data:value
+                        }
+                    ]
+                });
+            });
+            chart2.setOption(option2);
+
+            $("#table1").empty()
+            dim = []
+            type_ = $("#DA_DN option:selected").val()
+            select1 = $("#in2-form1 option:selected").val();
+            select = select1 + type_.split("_")[0].toUpperCase()
+            $.get('/user/' + select).done(function (data1) {
+                var tableitem1 = ""
+                var tableitem2 = ""
+                var name = []
+                for (var i in data1) {
+                    var map1 = new Map()
+                    map1.set("dim", data1[i].dim)
+                    // map1.set("value", data1[i].dau_cnts)
+                    map1.set("value",data1[i][type_])
+                    name.push(map1)
+                }
+
+                for (var i in name) {
+                    tableitem1 += "<th>" + name[i].get("dim") + "</th>",
+                        tableitem2 += "<td>" + name[i].get("value") + "</td>"
+                }
+                var $tableitem = $("<tr height=70px>" + tableitem1 + "</tr>" + "<tr height=70px>" + tableitem2 + "</tr>")
+                var table1 = document.getElementById("table1");
+                $tableitem.appendTo(table1)
+            })
+        }
+
+    </script>
+
+
+</div>
+</body>
+
+</html>

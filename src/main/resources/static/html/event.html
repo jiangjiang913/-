@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>交互事件概况分析</title>
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/echarts.min.js"></script>
+
+</head>
+<link rel="stylesheet" href="../css/index.css">
+<body>
+<label style="line-height: 5rem;font-size: 1.5rem;">交互事件概况分析</label>
+<div id="event" style="width: 90%;height: 400px;background:	#D4E6F1;"></div>
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('event'));
+    var option = {
+        title: {
+            text: ''
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {},
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                dataView: { readOnly: false },
+                magicType: { type: ['line', 'bar'] },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} '
+            }
+        },
+        series: [
+            {
+                name: 'cnts',
+                type: 'line',
+                // data: [10, 11, 13, 11, 12, 12, 9],
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                },
+                markLine: {
+                    data: [{ type: 'average', name: 'Avg' }]
+                }
+            },
+            {
+                name: 'users',
+                type: 'line',
+                // data: [1, -2, 2, 5, 3, 2, 0],
+                markPoint: {
+                    data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+                },
+                markLine: {
+                    data: [
+                        { type: 'average', name: 'Avg' },
+                        [
+                            {
+                                symbol: 'none',
+                                x: '90%',
+                                yAxis: 'max'
+                            },
+                            {
+                                symbol: 'circle',
+                                label: {
+                                    position: 'start',
+                                    formatter: 'Max'
+                                },
+                                type: 'max',
+                                name: '最高点'
+                            }
+                        ]
+                    ]
+                }
+            }
+        ]
+    };
+    // 定义x、y轴数据数组
+    var eventid=[];
+    var cnts=[];
+    var users=[];
+    //请求后台数据
+    $.ajax({
+        type: "get",
+        url: "/event/cnts_users",
+        contentType: "application/json",
+        success: function(res){
+            console.log("=====res: =======")
+            console.log(res);
+            for (var i = 0; i < res.length ; i++) {
+                eventid.push(res[i].eventid);
+                cnts.push(res[i].cnts);
+                users.push(res[i].users);
+            }
+            myChart.setOption({
+                xAxis: {
+                    data: eventid
+                },
+                series: [
+                    {
+                    // 根据名字对应到相应的系列
+                    name: 'cnts',
+                    data: cnts
+                    },
+                    {
+                        // 根据名字对应到相应的系列
+                        name: 'users',
+                        data: users
+                    }
+                ]
+            });
+        }
+    });
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+<label style="line-height: 5rem;font-size: 1.5rem;">交互事件分析报表</label>
+<table border="1" style="border-collapse:collapse;" width=80% height="10px" id="event_table"></table>
+<script>
+    //TODO 使用ajax添加表格元素
+    // var select_=$("#in1-form option:selected").val()
+    var eventid_str="<th>eventid</th>"
+    var cnts_str="<td>cnts</td>"
+    var users_str="<td>users</td>"
+    $.get("/event/cnts_users").done(function (data1){
+        for(i in data1){
+            eventid_str+="<th>"+data1[i].eventid+"</th>"
+            cnts_str+="<td>"+data1[i].cnts+"</td>"
+            users_str+="<td>"+data1[i].users+"</td>"
+        }
+        var item="<tr height=60px>"+eventid_str+"</tr>"
+            +"<tr height=60px>"+cnts_str+"</tr>"
+            +"<tr height=60px>"+users_str+"</tr>"
+        var event_table = document.getElementById("event_table")
+        $(item).appendTo(event_table)
+    });
+
+
+    //TODO 下面根据表单选项来动态改变数据以生成对应的可视化图
+    function showTraffic(){
+        // 定义x、y轴数据数组
+        var eventid=[];
+        var cnts=[];
+        var users=[];
+        //请求后台数据
+        $.ajax({
+            type: "get",
+            url: "/event/cnts_users",
+            contentType: "application/json",
+            success: function(res){
+                console.log("=====res: =======")
+                console.log(res);
+                for (var i = 0; i < res.length ; i++) {
+                    eventid.push(res[i].eventid);
+                    cnts.push(res[i].cnts);
+                    users.push(res[i].users);
+                }
+                myChart.setOption({
+                    xAxis: {
+                        data: eventid
+                    },
+                    series: [
+                        {
+                            // 根据名字对应到相应的系列
+                            name: 'cnts',
+                            data: cnts
+                        },
+                        {
+                            // 根据名字对应到相应的系列
+                            name: 'users',
+                            data: users
+                        }
+                    ]
+                });
+            }
+        });
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+
+        eventid_str="<th>eventid</th>"
+        cnts_str="<td>cnts</td>"
+        users_str="<td>users</td>"
+        $("#event_table").empty()//将table里的子元素全部清空
+        $.get("/event/cnts_users").done(function (data1){
+            for(i in data1){
+                eventid_str+="<th>"+data1[i].eventid+"</th>"
+                cnts_str+="<td>"+data1[i].cnts+"</td>"
+                users_str+="<td>"+data1[i].users+"</td>"
+            }
+            var item="<tr height=60px>"+eventid_str+"</tr>"
+                +"<tr height=60px>"+cnts_str+"</tr>"
+                +"<tr height=60px>"+users_str+"</tr>"
+            var event_table = document.getElementById("event_table")
+            $(item).appendTo(event_table)
+        });
+
+    }
+</script>
+
+<form id="event-form">
+    <label>交互事件用户Top10分析</label>
+    <select onchange="showEvent()">
+        <option value="accusationEvent" selected="selected">投诉事件</option>
+        <option value="appClickEvent">点击事件</option>
+        <option value="appStartEvent">打开事件</option>
+        <option value="appviewEvent">浏览事件</option>
+        <option value="clickChannelEvent">点击频道事件</option>
+        <option value="commentEvent">评论事件</option>
+        <option value="enterTabEvent">进入选项事件</option>
+        <option value="favoriteEvent">点赞事件</option>
+        <option value="getCodeEvent">获取代码事件</option>
+        <option value="installEvent">下载事件</option>
+        <option value="loginEvent">登录事件</option>
+        <option value="searchEvent">搜索事件</option>
+        <option value="shareEvent">分享转发事件</option>
+        <option value="sinUpEvent">报名事件</option>
+        <option value="viewConentDetailEvent">查看内容详细信息事件</option>
+        <option value="webStayEvent">网页停留事件</option>
+    </select>
+</form>
+<div id="event_top10" style="width: 90%;height: 400px;background:#D4E6F1;"></div>
+<script>
+    var chart2 = echarts.init(document.getElementById("event_top10"));
+    var option2 = {
+        title:{
+            text:'',
+            x:'center',
+            textStyle:{
+                fontSize:12
+            }
+        },
+        xAxis: {
+            type: 'category',
+            // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            data:[]
+        },
+        yAxis: {
+            type: 'value'
+        },
+        series: [
+            {
+                // data: [120, 200, 150, 80, 70, 110, 130],
+                data: [],
+                type: 'bar',
+                showBackground: true,
+                backgroundStyle: {
+                    color: 'rgba(180, 180, 180, 0.2)'
+                },
+                itemStyle: {
+                    color: '#CB4335'
+                }
+            }
+        ]
+    };
+    var guid=[]
+    var cnts=[]
+    var select1=$("#event-form option:selected").val()
+    $.get('/event/'+select1).done(function (data1){
+        for(var i in data1){
+            guid.push(data1[i].guid)
+            cnts.push(data1[i].cnts)
+        }
+        chart2.setOption({
+            xAxis: {
+                type:'category',
+                data:guid
+            },
+            series: [
+                {
+                    data:cnts
+                }
+            ]
+        });
+    });
+    chart2.setOption(option2);
+</script>
+
+<label style="line-height: 5rem;font-size: 1.5rem;">交互事件用户Top10报表</label>
+<table border="1" style="border-collapse:collapse;" width=80% height="10px" id="event_top10_table">
+</table>
+<script type="text/javascript">
+    //TODO 使用ajax添加表格元素
+    var select_=$("#event-form option:selected").val()
+    var guid_str="<th></th>"
+    var cnts_str="<td>cnts</td>"
+    $.get("/event/"+select_).done(function (data1){
+        // var map = new Map()
+        for(i in data1){
+            guid_str+="<th>"+data1[i].guid+"</th>"
+            cnts_str+="<td>"+data1[i].cnts+"</td>"
+        }
+        var item="<tr height=60px>"+guid_str+"</tr>"
+            +"<tr height=60px>"+cnts_str+"</tr>"
+        var event_top10_table = document.getElementById("event_top10_table")
+        $(item).appendTo(event_top10_table)
+    });
+
+    //TODO 下面根据表单选项来动态改变数据以生成对应的可视化图
+    function showEvent(){
+        var guid=[]
+        var cnts=[]
+        var select1=$("#event-form option:selected").val()
+        $.get('/event/'+select1).done(function (data1){
+            for(var i in data1){
+                guid.push(data1[i].guid)
+                cnts.push(data1[i].cnts)
+            }
+            chart2.setOption({
+                xAxis: {
+                    type:'category',
+                    data:guid
+                },
+                series: [
+                    {
+                        data:cnts
+                    }
+                ]
+            });
+        });
+        chart2.setOption(option2);
+
+        $("#event_top10_table").empty()
+        var select1=$("#event-form option:selected").val()
+        var guid_str="<th></th>"
+        var cnts_str="<td>cnts</td>"
+        $.get("/event/"+select1).done(function (data1){
+            // var map = new Map()
+            for(i in data1){
+                guid_str+="<th>"+data1[i].guid+"</th>"
+                cnts_str+="<td>"+data1[i].cnts+"</td>"
+            }
+            var item= "<tr height=60px>"+guid_str+"</tr>"
+                +"<tr height=60px>"+cnts_str+"</tr>"
+            var event_top10_table = document.getElementById("event_top10_table")
+            $(item).appendTo(event_top10_table)
+        });
+
+    }
+</script>
+</body>
+</html>

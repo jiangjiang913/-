@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>数据运营系统</title>
+</head>
+<link rel="stylesheet" href="../css/index.css">
+<body>
+<div id="main">
+    <!-- 左侧导航 -->
+    <div class="main_left" style="height:100%">
+        <ul style="list-style: none;">
+            <li data-src="traffic.html">流量概况分析</li>
+            <li data-src="user.html">日新日活分析</li>
+            <li data-src="event.html">交互事件分析</li>
+            <li data-src="event_ad.html">广告事件分析</li>
+        </ul>
+    </div>
+    <!-- 右侧内容 -->
+    <div class="main_right">
+        <iframe frameborder="0" scrolling="yes" src="traffic.html" id="aa" style="width:100%;height: 100%"></iframe>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="../js/jquery-1.11.0.min.js"></script>
+<script>
+    $(function(){
+        $(".main_left li").on("click",function(){
+            var address =$(this).attr("data-src");
+            $("iframe").attr("src",address);
+        });
+    });
+</script>
+</html>

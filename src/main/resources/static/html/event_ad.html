@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>广告事件分析</title>
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/echarts.min.js"></script>
+</head>
+<link rel="stylesheet" href="../css/index.css">
+<body>
+<label style="line-height: 5rem;font-size: 1.5rem;">广告事件分析</label>
+<div id="event_ad" style="width: 90%;height: 400px;background:#D4E6F1;"></div>
+<script>
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('event_ad'));
+    var option = {
+        title: {
+            text: ''
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {},
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                dataView: { readOnly: false },
+                magicType: { type: ['line', 'bar'] },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} '
+            }
+        },
+        series: [
+            {
+                name: 'show_ct',
+                type: 'line',
+                // data: [10, 11, 13, 11, 12, 12, 9],
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                },
+                markLine: {
+                    data: [{ type: 'average', name: 'Avg' }]
+                }
+            },
+            {
+                name: 'show_us',
+                type: 'line',
+                // data: [1, -2, 2, 5, 3, 2, 0],
+                markPoint: {
+                    data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+                },
+                markLine: {
+                    data: [
+                        { type: 'average', name: 'Avg' },
+                        [
+                            {
+                                symbol: 'none',
+                                x: '90%',
+                                yAxis: 'max'
+                            },
+                            {
+                                symbol: 'circle',
+                                label: {
+                                    position: 'start',
+                                    formatter: 'Max'
+                                },
+                                type: 'max',
+                                name: '最高点'
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                name: 'click_ct',
+                type: 'line',
+                // data: [10, 11, 13, 11, 12, 12, 9],
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                },
+                markLine: {
+                    data: [{ type: 'average', name: 'Avg' }]
+                }
+            },
+            {
+                name: 'click_ct',
+                type: 'line',
+                // data: [10, 11, 13, 11, 12, 12, 9],
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                },
+                markLine: {
+                    data: [{ type: 'average', name: 'Avg' }]
+                }
+            }
+        ]
+    };
+    // 定义x、y轴数据数组
+    var adid=[];
+    var show_ct=[];
+    var show_us=[];
+    var click_ct=[];
+    var click_us=[];
+    //请求后台数据
+    $.ajax({
+            type: "get",
+            url: "/event/advertise",
+            contentType: "application/json",
+        success: function(res){
+            console.log("=====res: =======")
+            console.log(res);
+            for (var i = 0; i < res.length ; i++) {
+                adid.push(res[i].adid);
+                show_ct.push(res[i].show_ct);
+                show_us.push(res[i].show_us);
+                click_ct.push(res[i].click_ct);
+                click_us.push(res[i].click_us);
+            }
+            myChart.setOption({
+                xAxis: {data: adid},
+                series: [
+                    {
+                        name: '曝光次数',
+                        data: show_ct
+                    },
+                    {
+                        name: '曝光人数',
+                        data: show_us
+                    },
+                    {
+                        name: '点击次数',
+                        data: click_ct
+                    },
+                    {
+                        name: '点击人数',
+                        data: click_us
+                    }
+                ]
+            });
+        }
+    });
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+<label style="line-height: 5rem;font-size: 1.5rem;">广告事件分析报表</label>
+<table border="1" style="border-collapse:collapse;" width=80% height="10px" id="event_ad_table"></table>
+<script>
+    var adid_str="<th>adid</th>"
+    var show_ct_str="<td>show_ct</td>"
+    var show_us_str="<td>show_us</td>"
+    var click_ct_str="<td>click_ct</td>"
+    var click_us_str="<td>click_us</td>"
+    $.get("/event/advertise").done(function (data1){
+        for(i in data1){
+            adid_str+="<th>"+data1[i].adid+"</th>"
+            show_ct_str+="<td>"+data1[i].show_ct+"</td>"
+            show_us_str+="<td>"+data1[i].show_us+"</td>"
+            click_ct_str+="<td>"+data1[i].click_ct+"</td>"
+            click_us_str+="<td>"+data1[i].click_us+"</td>"
+        }
+        var item="<tr height=60px>"+adid_str+"</tr>"
+            +"<tr height=60px>"+show_ct_str+"</tr>"
+            +"<tr height=60px>"+show_us_str+"</tr>"
+            +"<tr height=60px>"+click_ct_str+"</tr>"
+            +"<tr height=60px>"+click_us_str+"</tr>"
+        var event_table = document.getElementById("event_ad_table")
+        $(item).appendTo(event_table)
+    });
+
+
+    //TODO 下面根据表单选项来动态改变数据以生成对应的可视化图
+    function showTraffic(){
+        // 定义x、y轴数据数组
+        var adid=[];
+        var show_ct=[];
+        var show_us=[];
+        var click_ct=[];
+        var click_us=[];
+        //请求后台数据
+        $.ajax({
+            type: "get",
+            url: "/event/advertise",
+            contentType: "application/json",
+            success: function(res){
+                console.log("=====res: =======")
+                console.log(res);
+                for (var i = 0; i < res.length ; i++) {
+                    adid.push(res[i].adid);
+                    show_ct.push(res[i].show_ct);
+                    show_us.push(res[i].show_us);
+                    click_ct.push(res[i].click_ct);
+                    click_us.push(res[i].click_us);
+                }
+                myChart.setOption({
+                    xAxis: {
+                        data: adid
+                    },
+                    series: [
+                        {
+                            // 根据名字对应到相应的系列
+                            name: '曝光次数',
+                            data: show_ct
+                        },
+                        {
+                            // 根据名字对应到相应的系列
+                            name: '曝光人数',
+                            data: show_us
+                        },
+                        {
+                            // 根据名字对应到相应的系列
+                            name: '点击次数',
+                            data: click_ct
+                        },
+                        {
+                            // 根据名字对应到相应的系列
+                            name: '点击人数',
+                            data: click_us
+                        }
+                    ]
+                });
+            }
+        });
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+
+
+        var adid_str="<th>adid</th>"
+        var show_ct_str="<td>show_ct</td>"
+        var show_us_str="<td>show_us</td>"
+        var click_ct_str="<td>click_ct</td>"
+        var click_us_str="<td>click_us</td>"
+        $.get("/event/advertise").done(function (data1){
+            for(i in data1){
+                adid_str+="<th>"+data1[i].adid+"</th>"
+                show_ct_str+="<td>"+data1[i].show_ct+"</td>"
+                show_us_str+="<td>"+data1[i].show_us+"</td>"
+                click_ct_str+="<td>"+data1[i].click_ct+"</td>"
+                click_us_str+="<td>"+data1[i].click_us+"</td>"
+            }
+            var item="<tr height=60px>"+adid_str+"</tr>"
+                +"<tr height=60px>"+show_ct_str+"</tr>"
+                +"<tr height=60px>"+show_us_str+"</tr>"
+                +"<tr height=60px>"+click_ct_str+"</tr>"
+                +"<tr height=60px>"+click_us_str+"</tr>"
+            var event_table = document.getElementById("event_ad_table")
+            $(item).appendTo(event_table)
+        });
+
+
+    }
+</script>
+</body>
+</html>
