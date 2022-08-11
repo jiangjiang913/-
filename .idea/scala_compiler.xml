@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="Maven 1" modules="dataware">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="D:\shixi\data_warehouse\dataware\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 2" modules="recommand">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="E:\WeChat Files\wxid_ek1dl396gms122\FileStorage\MsgAttach\3f875dbff1737919d4f668d62efb38a2\File\2022-06\bigDataProject-master\recommand\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 3" modules="commons">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="D:\shixi\data_warehouse\commons\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 4" modules="userprofile">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="E:\WeChat Files\wxid_ek1dl396gms122\FileStorage\MsgAttach\3f875dbff1737919d4f668d62efb38a2\File\2022-06\bigDataProject-master\userprofile\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 5" modules="bigDataProject">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="E:\WeChat Files\wxid_ek1dl396gms122\FileStorage\MsgAttach\3f875dbff1737919d4f668d62efb38a2\File\2022-06\bigDataProject-master\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 6" modules="olap_web">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="D:\shixi\data_warehouse\olap_web\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+    <profile name="Maven 7" modules="data_warehouse">
+      <parameters>
+        <parameter value="-dependencyfile" />
+        <parameter value="D:\shixi\data_warehouse\target/.scala_dependencies" />
+      </parameters>
+    </profile>
+  </component>
+</project>
